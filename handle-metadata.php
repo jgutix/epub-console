@@ -6,10 +6,13 @@
  * Time: 11:02 AM
  */
 require 'simple_html_dom.php';
+$bookname=$_POST["bookname"];
 $zip1 = new ZipArchive;
-$_POST['book']='safari-documentation';
     //Opens a Zip archive
-$epub = $zip1->open('tmp/'.$_POST['book'].'.epub');
+$epub = $zip1->open('tmp/'.$_POST['bookname'].'.epub');
+if( $epub !== true ){
+    die("cannot open for writing.");
+}
 $internalFile = 'content.opf';
 $opf = $zip1->getFromName($internalFile);
 

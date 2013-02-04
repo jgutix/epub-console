@@ -379,7 +379,7 @@
             },
             uploadMetadata:function (callback) {
                 $.post('handle-metadata.php',
-                    $('#management-form input, #management-form textarea, #management-form select').serialize(),
+                    $('#bookname, #management-form input, #management-form textarea, #management-form select').serialize(),
                     function(data){
                         if(data.ok){
                             if (!!callback) {

@@ -7,5 +7,6 @@
  */
 
 $config = array(
-    'server'=>'safari.booktype.pro'
+//    'server'=>'safari.booktype.pro'
+    'server'=>'www.booki.cc'
 );

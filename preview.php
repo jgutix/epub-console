@@ -58,8 +58,11 @@ if(isset($_GET['book'])){
         $dom = str_get_html($xhtml);
         foreach($dom->find('img') as $element){
             $uri = $element->src;
-            $parts = pathinfo($uri);
-            $element->src='data:image/' . $parts['extension'] . ';base64,' . base64_encode($zip1->getFromName($uri));
+            if(!empty($uri) && $uri!='#' && !preg_match('/[http|ftp|https|mailto]:/', $uri)){
+                $parts = pathinfo($uri);
+                $element->src='data:image/' . (empty($parts['extension'])?'jpeg':$parts['extension']) . ';base64,' . base64_encode($zip1->getFromName($uri));
+            }
+
         }
         foreach($dom->find('h1') as $element){
             $element->class='chaptertitle';

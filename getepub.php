@@ -16,7 +16,7 @@ class GetEpub{
     public static function getFileEpub($book, $url){
         ini_set('max_execution_time', 180);
         $localLink = 'tmp/'.$book.'.epub';
-        if(copy($url, $localLink)){
+        if(copy(trim($url), $localLink)){
             return $localLink;
         }else{
             echo 'error';
