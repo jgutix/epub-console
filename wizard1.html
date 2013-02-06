@@ -63,6 +63,7 @@
                         <input type="text" name="bookname" id="bookname" required="required">
                     </div>
                 </div>
+                <fieldset id="metadata">
                 <legend>Metadata</legend>
                 <div class="control-group"><label class="control-label" for="book-title">Book title</label>
 
@@ -84,6 +85,7 @@
 
                     <div class="controls"><input type="text" name="rights" id="license"></div>
                 </div>
+                </fieldset>
             </fieldset>
             <fieldset>
                 <legend>Enter CSS</legend>
@@ -135,7 +137,7 @@
 
 <script type="text/x-handlebars-template" id="orphan-links-template">
     <div class="modal hide fade" id="orphan-modal">
-        <form id="orphan-form" class="form-horizontal modal-form" action="special-fix.php" method="post">
+        <form id="orphan-form" class="form-horizontal modal-form" action="manager/fixOrphans/" method="post">
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 These links should be fixed manually
@@ -284,13 +286,14 @@
                 });
             },
             process:function () {
-                var steps = [
+                var steps;
+                steps = [
 //                    {element: $('#downloading'), method: management.getDownloadURL},
-                    {element:$('#fetching'), method:management.downloadEpub, enabled: true},
-                    {element: $('#fixing'), method: management.fixLinks, enabled: $('#fix').is(':checked')},
-                    {element: $('#metadating'), method: management.uploadMetadata, enabled: true},
-                    {element:$('#cssing'), method:management.uploadCSS, enabled: !!$('#css').val()},
-                    {element:$('#covering'), method:management.uploadCover, enabled: !!$('#cover').val()}
+                    {element:$('#fetching'), method:management.downloadEpub, enabled:true},
+                    {element:$('#fixing'), method:management.fixLinks, enabled:$('#fix').is(':checked')},
+                    {element:$('#metadating'), method:management.uploadMetadata, enabled: $('#metadata').find('input').filter(function() { return !!this.value }).length>0},
+                    {element:$('#cssing'), method:management.uploadCSS, enabled:!!$('#css').val()},
+                    {element:$('#covering'), method:management.uploadCover, enabled:!!$('#cover').val()}
                 ];
                 $('#advance').show();
                 management.bookname = $('#bookname').val();
@@ -357,7 +360,7 @@
 
              },*/
             downloadEpub:function (callback) {
-                $.post('objavi-bridge.php', {book:management.bookname}, function (data) {
+                $.get('manager/getFromObjavi/'+management.bookname, function (data) {
                     if (data.ok) {
                         management.url = data.link;
                         var bookHistory = JSON.parse(localStorage.getItem('bookHistory'));
@@ -375,21 +378,25 @@
                     if (!!callback) {
                         callback(data.ok);
                     }
-                }, 'json');
+                }, 'json').error(function(){
+                            callback(false);
+                        });
             },
             uploadMetadata:function (callback) {
-                $.post('handle-metadata.php',
-                    $('#bookname, #management-form input, #management-form textarea, #management-form select').serialize(),
+                $.post('manager/addMetadata/',
+                    $('#metadata').serialize()+'&book='+management.bookname,
                     function(data){
                         if(data.ok){
                             if (!!callback) {
                                 callback(data.ok);
                             }
                         }
-                    }, 'json');
+                    }, 'json').error(function(){
+                            callback(false);
+                        });
             },
             fixLinks:function (callback) {
-                $.getJSON('fix-links.php', {book: management.bookname, local: management.url}, function(data){
+                $.getJSON('manager/fixLinks/'+management.bookname, function(data){
                     if(!!data.orphanLinks){
                         management.fixManuallyLinks(data, callback);
                     }else{
@@ -398,7 +405,9 @@
                         }
                     }
 
-                });
+                }).error(function(){
+                        callback(false);
+                    });
             },
             fixManuallyLinks:function (data, callback) {
                 Handlebars.registerHelper('select', function(item){
@@ -410,6 +419,7 @@
                 management.modalTemplate = Handlebars.compile($('#orphan-links-template').html());
                 management.optionsTemplate = Handlebars.compile($('#select-template').html());
 //                management.silence=true;
+                //TODO: improve this
                 $('#orphan-modal').remove();
                 management.xhtmlFiles = management.optionsTemplate(data.xhtmlFiles);
                 $('body').append(management.modalTemplate(data));//.modal('show');
@@ -432,7 +442,7 @@
                 });
             },
             uploadCSS:function (callback) {
-                $.post('inject-css.php', {css:$('#css').val(),
+                $.post('manager/injectCSS/', {css:$('#css').val(),
                     book:management.bookname}, function (data) {
                     if (!!callback) {
                         callback(data.ok);
@@ -451,7 +461,7 @@
                     contentType:false,
                     processData:false,
                     type:"POST",
-                    url:"inject-cover.php",
+                    url:"manager/injectCover/",
                     dataType:'json',
                     data:fd,
                     success:function (data, textStatus, jqXHR) {
