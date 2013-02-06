@@ -38,7 +38,6 @@ if(isset($_GET['book'])){
     $epub = $zip1->open($file);
     $toc = $zip1->getFromName('toc.ncx');
     $xml = new SimpleXMLElement($toc);
-//    echo '<pre>'; print_r($xml->navMap->navPoint); echo '</pre>';
     $sections = array();
     foreach($xml->navMap->navPoint as $navPoint){
         $sectionId = $navPoint->content->attributes()->src[0];
@@ -54,6 +53,9 @@ if(isset($_GET['book'])){
     }
     $fullHTML='';
     foreach($xhtmlFiles as $entry){
+        if($entry=='cover.xhtml'){
+            continue;
+        }
         $xhtml = $zip1->getFromName($entry);
         $dom = str_get_html($xhtml);
         foreach($dom->find('img') as $element){
@@ -70,18 +72,13 @@ if(isset($_GET['book'])){
         }
 
         foreach($dom->find('h2') as $element){
-//            $h2s[$entry][] = $element->innertext;
             $next = $element->next_sibling();
-            $element->outertext='<div class="no-page-break">'.$element->outertext.$next->outertext.'</div>';
-            $next->outertext='';
-
+            if(!empty($next)){
+                $element->outertext='<div class="no-page-break">'.$element->outertext.$next->outertext.'</div>';
+                            $next->outertext='';
+            }
         }
 
-//        $section = '<div class="sectionpage">'.'<h1 class="sectiontitle">'.$h1.'</h1>';
-//        foreach($h2s as $element){
-//            $section.='<h2>'.$element.'</h2>';
-//        }
-//        $section .='</div>';
         $body = $dom->find('body', 0);
         $fullHTML.= (isset($sections[$entry])?$sections[$entry]:'')
             .'<div class="chapter">'.$body->innertext.'</div>';
