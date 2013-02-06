@@ -114,6 +114,8 @@
                             <input type="checkbox" name="download" id="download">Download EPUB</label>
                         <label class="checkbox" for="create-bookjs">
                             <input type="checkbox" name="create-bookjs" id="create-bookjs">Create BookJS</label>
+                        <label class="checkbox" for="editablecss">
+                            <input type="checkbox" name="editable" id="editablecss">Make editable CSS</label>
                     </div>
                 </div>
             </fieldset>
@@ -338,7 +340,8 @@
             end: function(){
                 var $result = $('#result');
                 if($('#create-bookjs').is(':checked')){
-                    $result.find('#bookjs').attr('href', 'preview.php?book='+management.bookname).removeClass('hide');
+                    $result.find('#bookjs').attr('href',
+                            'preview.php?book='+management.bookname+($('#editablecss').is(':checked')?'&editablecss':'')).removeClass('hide');
 
                 }
                 $result.find('#epub').attr('href', management.url).removeClass('hide');

@@ -94,7 +94,28 @@ if(isset($_GET['book'])){
     <meta charset="UTF-8">
     <title>Preview</title>
     <link rel="stylesheet" href="https://raw.github.com/sourcefabric/BookJS/master/book.css">
+    <?php if(!isset($_GET['editablecss'])):?>
     <style type="text/css"><?php echo $css;?></style>
+    <?php else:?>
+    <style>
+        body style {
+            display: block;
+            background: #e1e1e1;
+            color: black;
+            font: 10px courier;
+            padding: 5px;
+            white-space: pre;
+            width:180px;
+            height:100%;
+             position: fixed;
+          top: 5px;
+          bottom: 5px;
+          overflow-y:auto;
+          border: 1px solid green;
+        }
+    </style>
+    <?php endif;?>
+
 <!--    <script type="text/javascript" src="https://raw.github.com/sourcefabric/BookJS/master/book-config.js"></script>-->
     <script type="text/javascript">
         paginationConfig = {
@@ -103,7 +124,7 @@ if(isset($_GET['book'])){
             'chapterStartMarker': 'div.chapter',
             'chapterTitleMarker': 'h1.chaptertitle',
 //        //    'flowElement': "document.getElementById('flowstuff')",
-            'flowElement': 'document.body',
+            'flowElement': "document.getElementById('flow')",
             'alwaysEven': true,
 //            'columns': 2,
             'enableFrontmatter': true,
@@ -121,6 +142,11 @@ if(isset($_GET['book'])){
     <script type="text/javascript" src="https://raw.github.com/sourcefabric/BookJS/master/book.js"></script>
 </head>
 <body>
+<?php if(isset($_GET['editablecss'])):?>
+<style contenteditable><?php echo $css;?></style>
+<?php endif;?>
+<div id="flow">
 <?php echo $fullHTML;?>
+</div>
 </body>
 </html>
