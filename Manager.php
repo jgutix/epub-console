@@ -7,7 +7,7 @@
  */
 class Manager
 {
-    public function getFromObjavi($book)
+    public static function getFromObjavi($book)
     {
         require 'getepub.php';
         $result = array('ok'=>false);
@@ -31,7 +31,7 @@ class Manager
         return $result;
     }
 
-    public function fixLinks($book){
+    public static function fixLinks($book){
         //no epub extension
         if ($book) {
             $local = 'tmp/'.$book.'.epub';
@@ -50,13 +50,13 @@ class Manager
         }
     }
 
-    public function fixOrphans(){
+    public static function fixOrphans(){
         $epub = new EPUB('tmp/'.$_POST['book'].'.epub');
         $epub->fixOrphanLinks($_POST);
         return array('ok'=>1);
     }
     
-    public function injectCSS(){
+    public static function injectCSS(){
         if(isset($_POST['book']) && isset($_POST['css'])){
             $epub = new EPUB('tmp/'.$_POST['book'].'.epub');
             $epub->uploadCSS($_POST['css']);
@@ -66,7 +66,7 @@ class Manager
         }
     }
 
-    public function injectCover(){
+    public static function injectCover(){
         if(isset($_POST['book']) && isset($_POST['cover'])){
             $coverJpg = self::decodeImg($_POST['cover']);
             $epub = new EPUB('tmp/'.$_POST['book'].'.epub');
@@ -89,7 +89,7 @@ class Manager
         return base64_decode(chunk_split($matches[2]));
     }
 
-    public function addMetadata()
+    public static function addMetadata()
     {
         $book='tmp/'.$_POST['book'].'.epub';
         $zip1 = new ZipArchive;

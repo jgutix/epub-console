@@ -93,7 +93,7 @@ if(isset($_GET['book'])){
 <head>
     <meta charset="UTF-8">
     <title>Preview</title>
-    <link rel="stylesheet" href="https://raw.github.com/sourcefabric/BookJS/master/book.css">
+    <link rel="stylesheet" href="https://raw.github.com/sourcefabric/BookJS/0.25.0/book.css">
     <?php if(!isset($_GET['editablecss'])):?>
     <style type="text/css"><?php echo $css;?></style>
     <?php else:?>
@@ -123,23 +123,18 @@ if(isset($_GET['book'])){
             'sectionTitleMarker': 'h1.sectiontitle',
             'chapterStartMarker': 'div.chapter',
             'chapterTitleMarker': 'h1.chaptertitle',
-//        //    'flowElement': "document.getElementById('flowstuff')",
             'flowElement': "document.getElementById('flow')",
             'alwaysEven': true,
-//            'columns': 2,
             'enableFrontmatter': true,
             'bulkPagesToAdd': 50,
             'pagesToAddIncrementRatio': 1.4,
             'frontmatterContents': '<h1><?php echo $xml->docTitle->text;?></h1>'
-//        	+ '<h3>Book subtitle</h3><h5>'
-//        	+ 'ed. Editor 1, Editor II, Editor III</h5><div class="pagination-pagebreak">'
-//        	+ '</div><div id="copyrightpage">Copyright: You<br>License: CC</div>'
         	+ '<div class="pagination-pagebreak"></div>',
             'autoStart': true
 
         }
     </script>
-    <script type="text/javascript" src="https://raw.github.com/sourcefabric/BookJS/master/book.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/sourcefabric/0.25.0/master/book.js"></script>
 </head>
 <body>
 <?php if(isset($_GET['editablecss'])):?>
