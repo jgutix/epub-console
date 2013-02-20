@@ -19,8 +19,8 @@ require 'EPUB.php';
 require_once preg_replace('/\W/si', '', $controller).'.php';
 
 //$object = new $controller();
-//$result = call_user_func( $controller.'::'.$method, $params ); // (As of PHP 5.2.3)
-$result = $controller::$method($params); //the right way
+$result = call_user_func( $controller.'::'.$method, $params ); // (As of PHP 5.2.3)
+//$result = $controller::$method($params); //the right way
 
 //All requests are returned as json
 if(!empty($result)){
