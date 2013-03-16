@@ -17,8 +17,6 @@ class EPUB
         //Opens a Zip archive
         if($epub = $this->zip->open($file)){
             $this->localFile = $file;
-        }else{
-            echo 'Can not open: '.$file;
         }
     }
 
@@ -36,41 +34,6 @@ class EPUB
             </display_options>');
     }
 
-    public function fixXHTML(){
-        require_once dirname(__FILE__).'/library/HTMLPurifier.auto.php';
-        $config = HTMLPurifier_Config::createDefault();
-        $purifier = new HTMLPurifier($config);
-        $this->xhtmlFiles = $this->getXhtmlFiles();
-        $this->setShortedChapters();
-        foreach ($this->xhtmlFiles as $item) {
-//            $clean_html = $purifier->purify($dirty_html);
-            $this->backToEpub($item, $purifier->purify($this->zip->getFromName($item)));
-        }
-
-    }
-
-    public function addStaticFile($file, $mediaType){
-        $zippedPath = 'static/'.$file;
-        $this->zip->addFile($file, $zippedPath);
-
-        $internalFile = 'content.opf';
-        $opf = $this->zip->getFromName($internalFile);
-        $xml = new SimpleXMLElement($opf);
-        $xml->registerXPathNamespace('opf', 'http://www.idpf.org/2007/opf');
-        $result = $xml->xpath('//opf:manifest/opf:item[@media-type="text/css"]');
-        if(empty($result)){
-            $cssItem = $xml->manifest->addChild('item');
-            $cssItem->addAttribute('href', $zippedPath);
-            $cssItem->addAttribute('id', str_replace('/','_', str_replace('.','',$zippedPath)));
-            $cssItem->addAttribute('media-type', $mediaType);
-        }
-
-        $this->zip->addFromString($internalFile, $xml->asXML());
-    }
-
-    /**
-     * Fix anchors linking to local files
-     */
     function fixLocalFile()
     {
 //        $this->localFile = $file;
@@ -154,16 +117,16 @@ class EPUB
 
     private function backToEpub($file, $content)
     {
-//        $this->zip = new ZipArchive;
+        $this->zip = new ZipArchive;
         //Opens a Zip archive
-//        if ($this->epub = $this->zip->open($this->localFile)) {//TODO: I think it's not necessary
+        if ($this->epub = $this->zip->open($this->localFile)) {
             if (!$this->zip->addFromString($file, $content)) {
                 echo 'error';
             }
-//            $this->zip->close();
-//        } else {
-//            echo 'Not found!';
-//        }
+            $this->zip->close();
+        } else {
+            echo 'Not found!';
+        }
 
     }
 
@@ -186,9 +149,6 @@ class EPUB
     }
     
     public function uploadCSS($content){
-        if (get_magic_quotes_gpc()) {
-            $content = stripslashes($content);
-        }
         $cssFile = 'objavi.css';
         if (!$this->zip->addFromString($cssFile, $content)) {
             return array('ok'=>false);
@@ -232,7 +192,6 @@ class EPUB
             $cssItem->addAttribute('id', 'css');
             $cssItem->addAttribute('media-type', 'text/css');
         }
-        $this->zip->addFromString($internalFile, $xml->asXML());
     }
 
     private function createCoverHtml($file)

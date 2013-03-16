@@ -60,7 +60,7 @@ if(isset($_GET['book'])){
         $dom = str_get_html($xhtml);
         foreach($dom->find('img') as $element){
             $uri = $element->src;
-            if(!empty($uri) && $uri!='#' && !preg_match('/[http|ftp|https|mailto]:/', $uri)){
+            if(!empty($uri) && $uri!='#' && !preg_match('/[http|ftp|https|mailto|data]:/', $uri)){
                 $parts = pathinfo($uri);
                 $element->src='data:image/' . (empty($parts['extension'])?'jpeg':$parts['extension']) . ';base64,' . base64_encode($zip1->getFromName($uri));
             }
@@ -79,6 +79,15 @@ if(isset($_GET['book'])){
             }
         }
 
+        foreach($dom->find('table#bluebox') as $element){
+            foreach($element->find('li') as $li){
+                $li->outertext='<div class="listbreak">'.$li->outertext.'</div>';
+            }
+            $element->outertext='<div class="tablebreak">'.$element->outertext.'</div>';
+        }
+
+
+
         $body = $dom->find('body', 0);
         $fullHTML.= (isset($sections[$entry])?$sections[$entry]:'')
             .'<div class="chapter">'.$body->innertext.'</div>';
@@ -86,14 +95,26 @@ if(isset($_GET['book'])){
 
     /** CSS */
     $css = $zip1->getFromName('objavi.css');
-}
+
+    $opf = $zip1->getFromName('content.opf');
+
+    $xml = new SimpleXMLElement($opf);
+    //Use that namespace
+    $namespaces = $xml->getNameSpaces(true);
+    //Now we don't have the URL hard-coded
+    $dc = $xml->metadata->children($namespaces['dc']);
+    $bookTitle = empty($dc->title)?$xml->docTitle->text:$dc->title;
+    $zip1->close();
+}//end if
 ?>
 <!DOCTYPE HTML>
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
     <title>Preview</title>
-    <link rel="stylesheet" href="https://raw.github.com/sourcefabric/BookJS/0.25.0/book.css">
+    <!-- 
+		<link rel="stylesheet" href="css/book.css">
+    -->
     <?php if(!isset($_GET['editablecss'])):?>
     <style type="text/css"><?php echo $css;?></style>
     <?php else:?>
@@ -119,29 +140,47 @@ if(isset($_GET['book'])){
 <!--    <script type="text/javascript" src="https://raw.github.com/sourcefabric/BookJS/master/book-config.js"></script>-->
     <script type="text/javascript">
         paginationConfig = {
-            'sectionStartMarker': 'div.section',
-            'sectionTitleMarker': 'h1.sectiontitle',
+            'sectionStartMarker': 'none',
+            'sectionTitleMarker': 'none',
             'chapterStartMarker': 'div.chapter',
             'chapterTitleMarker': 'h1.chaptertitle',
+//        //    'flowElement': "document.getElementById('flowstuff')",
             'flowElement': "document.getElementById('flow')",
-            'alwaysEven': true,
-            'enableFrontmatter': true,
-            'bulkPagesToAdd': 50,
+            'alwaysEven': false,
+//            'columns': 2,
+            'enableFrontmatter': false,
+            'bulkPagesToAdd': 50,             
+	    'pageHeight': 9.66,
+            'pageWidth': 7.44,
+//	   'headerTopMargin':1.2in,
+//	   'innerMargin':0.8in,
+//	   'outerMargin':0.8in,
+//	   'divideContents':false; 
             'pagesToAddIncrementRatio': 1.4,
-            'frontmatterContents': '<h1><?php echo $xml->docTitle->text;?></h1>'
+            'frontmatterContents': '<h1><?php echo $bookTitle;?></h1>'
+//        	+ '<h3>Book subtitle</h3><h5>'
+//        	+ 'ed. Editor 1, Editor II, Editor III</h5><div class="pagination-pagebreak">'
+//        	+ '</div><div id="copyrightpage">Copyright: You<br>License: CC</div>'
         	+ '<div class="pagination-pagebreak"></div>',
             'autoStart': true
 
         }
     </script>
-    <script type="text/javascript" src="https://raw.github.com/sourcefabric/0.25.0/master/book.js"></script>
+    <script type="text/javascript" src="js/book.js"></script>
 </head>
-<body>
+<body class="sweet-hyphens">
 <?php if(isset($_GET['editablecss'])):?>
 <style contenteditable><?php echo $css;?></style>
 <?php endif;?>
-<div id="flow">
+<div id="flow" class="sweet-hyphens">
 <?php echo $fullHTML;?>
 </div>
+<style>
+ .pagination-page .pagination-header-chapter:before,   .pagination-page .pagination-header-section:before { 
+ content:"<?php echo $bookTitle;?>" !important;
+}
+</style>
+ <script src="js/jquery-1.4.4.min.js"></script>
+  <script src="js/sweet-justice.js"></script>
 </body>
 </html>

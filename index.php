@@ -26,3 +26,5 @@ $result = call_user_func( $controller.'::'.$method, $params ); // (As of PHP 5.2
 if(!empty($result)){
     echo json_encode($result);
 }
+
+?>

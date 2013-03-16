@@ -1,7 +1,14 @@
 AddDefaultCharset UTF-8
+AuthUserFile /var/www/safari/.htpasswd
+AuthGroupFile /dev/null
+AuthName EnterPassword
+AuthType Basic
+
+require user safari
+
 <IfModule mod_rewrite.c>
     RewriteEngine on
-    RewriteBase /~jgutix/jgutix.koding.com/website/console2
+    RewriteBase /
     #rewritebase is the path relative to document root
 
     RewriteCond %{SCRIPT_FILENAME} !-d

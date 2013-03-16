@@ -7,8 +7,8 @@
  */
 
 $config = array(
-//    'server'=>'safari.booktype.pro'
-    'server' => 'www.booki.cc',
+    'server'=>'safari.booktype.pro',
+//    'server' => 'www.booki.cc',
     'automatic-apple-fix' => true,
-    'folder' => '/console2/' //set folder to empty, if your links start from root'
+    'folder' => '' //set folder to empty, if your links start from root'
 );

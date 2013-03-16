@@ -16,13 +16,11 @@ class Manager
             $link = GetEpub::getURL($book, Config::get('server'));
             if(!empty($link)){
                 $localLink = GetEpub::getFileEpub($book, $link);
-                $epub = new EPUB($localLink);
-//                $epub->fixXHTML();
                 if(Config::get('automatic-apple-fix')){
+                    $epub = new EPUB($localLink);
                     $epub->addAppleOptions();
+                    $epub->close();
                 }
-                $epub->addStaticFile('yellowcircle9.png', 'image/png');
-                $epub->close();
                 return array('ok'=>1, 'link'=>$localLink);
             }else{
                 $result['error']='Objavi returns nothing';
@@ -112,19 +110,19 @@ class Manager
         if(!empty($_POST['title'])){
             $dc->title = $_POST['title'];
         }
-        if(!empty($_POST['author'])){
+        if(!empty($_POST['title'])){
             $dc->creator=$_POST['author'];
         }
 
-        if(!empty($_POST['publisher'])){
+        if(!empty($_POST['title'])){
             $dc->publisher= $_POST['publisher'];
         }
 
-        if(!empty($_POST['date'])){
+        if(!empty($_POST['title'])){
             $dc->date[2]= $_POST['date'];
         }
 
-        if(!empty($_POST['rights'])){
+        if(!empty($_POST['title'])){
             $dc->rights= $_POST['rights'];
         }
 
